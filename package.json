@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "worker": "ts-node --project tsconfig.json worker.ts",
-    "migrate": "ts-node --project tsconfig.json scripts/migrate.ts",
+    "migrate": "ts-node --compiler-options '{\"module\":\"commonjs\",\"moduleResolution\":\"node\"}' scripts/migrate.ts",
     "test": "jest",
     "test:watch": "jest --watch"
   },
