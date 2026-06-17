@@ -29,11 +29,15 @@ async function migrate() {
       }
       console.log(`Applying ${file}...`)
       const sql = readFileSync(join(dir, file), 'utf-8')
-      await client.query(sql)
-      await client.query(
-        'INSERT INTO schema_migrations (version) VALUES ($1)',
-        [version]
-      )
+      await client.query('BEGIN')
+      try {
+        await client.query(sql)
+        await client.query('INSERT INTO schema_migrations (version) VALUES ($1)', [version])
+        await client.query('COMMIT')
+      } catch (err) {
+        await client.query('ROLLBACK')
+        throw err
+      }
       console.log(`Applied ${file}`)
     }
   } finally {

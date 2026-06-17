@@ -40,9 +40,23 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trg_sync_place_location ON places;
 CREATE TRIGGER trg_sync_place_location
 BEFORE INSERT OR UPDATE OF latitude, longitude ON places
 FOR EACH ROW EXECUTE FUNCTION sync_place_location();
+
+CREATE OR REPLACE FUNCTION set_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = now();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_places_updated_at ON places;
+CREATE TRIGGER trg_places_updated_at
+BEFORE UPDATE ON places
+FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
 CREATE INDEX idx_places_location ON places USING GIST (location);
 CREATE UNIQUE INDEX idx_places_external ON places (source, external_id)
@@ -78,14 +92,10 @@ CREATE TABLE scrape_jobs (
   lat            DOUBLE PRECISION NOT NULL,
   lng            DOUBLE PRECISION NOT NULL,
   radius         INTEGER NOT NULL,
-  status         TEXT NOT NULL DEFAULT 'pending',
+  status         TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'running', 'completed', 'failed')),
   apify_run_ids  JSONB,
   places_found   INTEGER,
   started_at     TIMESTAMPTZ,
   completed_at   TIMESTAMPTZ
 );
 
-CREATE TABLE schema_migrations (
-  version    TEXT PRIMARY KEY,
-  applied_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
