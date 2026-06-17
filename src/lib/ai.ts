@@ -99,8 +99,8 @@ Respond with ONLY a valid JSON array. Each item must have:
             cons: [],
             best_for: [],
             visit_duration: '',
-            hidden_gem_score: 0,
-            tourist_trap_score: 0,
+            hidden_gem_score: 50,
+            tourist_trap_score: 50,
           },
         ]
 
