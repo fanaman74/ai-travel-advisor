@@ -72,7 +72,7 @@ describe('enrichPlaces', () => {
 
     expect(result).toHaveLength(1)
     expect(result[0].summary).toBe('')
-    expect(result[0].hidden_gem_score).toBe(0)
+    expect(result[0].hidden_gem_score).toBe(50)
   })
 
   it('pads results if AI returns fewer items than places', async () => {
@@ -114,6 +114,8 @@ describe('enrichPlaces', () => {
     expect(result).toHaveLength(2)
     expect(result[0].summary).toBe('Only one')
     expect(result[1].summary).toBe('')
+    expect(result[1].hidden_gem_score).toBe(50)
+    expect(result[1].tourist_trap_score).toBe(50)
   })
 })
 

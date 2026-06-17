@@ -89,8 +89,8 @@ Respond with ONLY a valid JSON array. Each item must have:
           cons: item.cons ?? [],
           best_for: item.best_for ?? [],
           visit_duration: item.visit_duration ?? '',
-          hidden_gem_score: item.hidden_gem_score ?? 0,
-          tourist_trap_score: item.tourist_trap_score ?? 0,
+          hidden_gem_score: item.hidden_gem_score ?? 50,
+          tourist_trap_score: item.tourist_trap_score ?? 50,
         }))
       : [
           {
@@ -124,8 +124,8 @@ Respond with ONLY a valid JSON array. Each item must have:
       cons: [],
       best_for: [],
       visit_duration: '',
-      hidden_gem_score: 0,
-      tourist_trap_score: 0,
+      hidden_gem_score: 50,
+      tourist_trap_score: 50,
     }))
   }
 }
