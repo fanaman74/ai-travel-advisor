@@ -74,14 +74,13 @@ Respond with ONLY a valid JSON array. Each item must have:
   "tourist_trap_score": number 0-100
 }`
 
-  const response = await client.chat.completions.create({
-    model: 'deepseek-chat',
-    messages: [{ role: 'user', content: prompt }],
-  })
-
-  const content = response.choices[0]?.message?.content || ''
-
   try {
+    const response = await client.chat.completions.create({
+      model: 'deepseek-chat',
+      messages: [{ role: 'user', content: prompt }],
+    })
+
+    const content = response.choices[0]?.message?.content || ''
     const parsed = JSON.parse(content)
     const result = Array.isArray(parsed)
       ? parsed.map((item) => ({
@@ -184,14 +183,13 @@ Respond with ONLY a valid JSON array with no markdown formatting:
   }
 ]`
 
-  const response = await client.chat.completions.create({
-    model: 'deepseek-chat',
-    messages: [{ role: 'user', content: prompt }],
-  })
-
-  const content = response.choices[0]?.message?.content || ''
-
   try {
+    const response = await client.chat.completions.create({
+      model: 'deepseek-chat',
+      messages: [{ role: 'user', content: prompt }],
+    })
+
+    const content = response.choices[0]?.message?.content || ''
     const parsed = JSON.parse(content)
     return Array.isArray(parsed) ? parsed : []
   } catch {
@@ -241,21 +239,21 @@ Respond with ONLY a valid JSON object (no markdown):
   ]
 }`
 
-  // deepseek-reasoner for complex multi-stop planning
-  const response = await client.chat.completions.create({
-    model: 'deepseek-reasoner',
-    messages: [{ role: 'user', content: prompt }],
-  })
-
-  let content = response.choices[0]?.message?.content || ''
-
-  // Strip markdown code fences
-  content = content
-    .replace(/^```(?:json)?\n?/, '')
-    .replace(/\n?```$/, '')
-    .trim()
-
   try {
+    // deepseek-reasoner for complex multi-stop planning
+    const response = await client.chat.completions.create({
+      model: 'deepseek-reasoner',
+      messages: [{ role: 'user', content: prompt }],
+    })
+
+    let content = response.choices[0]?.message?.content || ''
+
+    // Strip markdown code fences
+    content = content
+      .replace(/^```(?:json)?\n?/, '')
+      .replace(/\n?```$/, '')
+      .trim()
+
     const parsed = JSON.parse(content)
     return {
       title: parsed.title ?? `Itinerary for ${input.city}`,
