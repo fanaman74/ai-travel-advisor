@@ -1,12 +1,12 @@
 import Redis from 'ioredis'
 
-let redis: Redis | null = null
+const g = globalThis as typeof globalThis & { _redis?: Redis }
 
 export function getRedis(): Redis {
-  if (!redis) {
-    redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
+  if (!g._redis) {
+    g._redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
       maxRetriesPerRequest: null,
     })
   }
-  return redis
+  return g._redis
 }

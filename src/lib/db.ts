@@ -1,15 +1,15 @@
 import { Pool } from 'pg'
 
-let pool: Pool | null = null
+const g = globalThis as typeof globalThis & { _pgPool?: Pool }
 
 export function getPool(): Pool {
-  if (!pool) {
-    pool = new Pool({
+  if (!g._pgPool) {
+    g._pgPool = new Pool({
       connectionString: process.env.DATABASE_URL,
       max: 10,
     })
   }
-  return pool
+  return g._pgPool
 }
 
 export async function query<T = Record<string, unknown>>(
