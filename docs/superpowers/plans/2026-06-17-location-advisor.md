@@ -261,8 +261,8 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```env
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/location_advisor
 REDIS_URL=redis://localhost:6379
-DEEPSEEK_API_KEY=sk-REDACTED
-APIFY_API_KEY=apify_api_REDACTED
+DEEPSEEK_API_KEY=sk-...
+APIFY_API_KEY=apify_api_...
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
