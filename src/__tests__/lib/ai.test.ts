@@ -74,6 +74,47 @@ describe('enrichPlaces', () => {
     expect(result[0].summary).toBe('')
     expect(result[0].hidden_gem_score).toBe(0)
   })
+
+  it('pads results if AI returns fewer items than places', async () => {
+    mockCreate.mockResolvedValue({
+      choices: [
+        {
+          message: {
+            content: JSON.stringify([
+              {
+                summary: 'Only one',
+                pros: [],
+                cons: [],
+                best_for: [],
+                visit_duration: '1h',
+                hidden_gem_score: 50,
+                tourist_trap_score: 30,
+              },
+            ]),
+          },
+        },
+      ],
+    })
+
+    const result = await enrichPlaces([
+      {
+        name: 'Place A',
+        type: 'attraction',
+        rating: 4.0,
+        reviews: [],
+      },
+      {
+        name: 'Place B',
+        type: 'restaurant',
+        rating: 4.5,
+        reviews: [],
+      },
+    ])
+
+    expect(result).toHaveLength(2)
+    expect(result[0].summary).toBe('Only one')
+    expect(result[1].summary).toBe('')
+  })
 })
 
 describe('generateAreaBriefing', () => {

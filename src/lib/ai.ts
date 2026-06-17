@@ -83,7 +83,7 @@ Respond with ONLY a valid JSON array. Each item must have:
 
   try {
     const parsed = JSON.parse(content)
-    return Array.isArray(parsed)
+    const result = Array.isArray(parsed)
       ? parsed.map((item) => ({
           summary: item.summary ?? '',
           pros: item.pros ?? [],
@@ -104,6 +104,20 @@ Respond with ONLY a valid JSON array. Each item must have:
             tourist_trap_score: 0,
           },
         ]
+
+    // Pad result if AI returns fewer items than input places
+    while (result.length < places.length) {
+      result.push({
+        summary: '',
+        pros: [],
+        cons: [],
+        best_for: [],
+        visit_duration: '',
+        hidden_gem_score: 50,
+        tourist_trap_score: 50,
+      })
+    }
+    return result.slice(0, places.length)
   } catch {
     return places.map(() => ({
       summary: '',
@@ -130,12 +144,16 @@ Include:
 
 Keep it to 2-3 sentences. Be poetic but informative.`
 
-  const response = await client.chat.completions.create({
-    model: 'deepseek-chat',
-    messages: [{ role: 'user', content: prompt }],
-  })
+  try {
+    const response = await client.chat.completions.create({
+      model: 'deepseek-chat',
+      messages: [{ role: 'user', content: prompt }],
+    })
 
-  return response.choices[0]?.message?.content || ''
+    return response.choices[0]?.message?.content ?? ''
+  } catch {
+    return ''
+  }
 }
 
 export async function generateRecommendations(input: {
@@ -223,6 +241,7 @@ Respond with ONLY a valid JSON object (no markdown):
   ]
 }`
 
+  // deepseek-reasoner for complex multi-stop planning
   const response = await client.chat.completions.create({
     model: 'deepseek-reasoner',
     messages: [{ role: 'user', content: prompt }],
