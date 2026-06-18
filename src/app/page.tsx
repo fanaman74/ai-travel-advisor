@@ -3,7 +3,6 @@ import { useState } from 'react'
 import { useLocation } from '@/hooks/useLocation'
 import { useJobStatus } from '@/hooks/useJobStatus'
 import { useNearby } from '@/hooks/useNearby'
-import { usePreferences } from '@/hooks/useLocalStorage'
 import { AreaBriefing } from '@/components/AreaBriefing'
 import { QuickActionGrid } from '@/components/QuickActionGrid'
 import { PlaceCard } from '@/components/PlaceCard'
@@ -14,8 +13,6 @@ export default function DashboardPage() {
   const { location, jobId, loading: locLoading, error } = useLocation()
   const jobStatus = useJobStatus(jobId)
   const [radius, setRadius] = useState(5000)
-  const [preferences] = usePreferences()
-
   const jobDone = jobStatus.status === 'completed' || jobStatus.status === 'failed'
   const { places, loading: placesLoading } = useNearby(
     location?.latitude ?? null,

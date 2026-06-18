@@ -1,3 +1,4 @@
+'use client'
 import { ExplorePage } from '../ExplorePage'
 import type { Place } from '@/types'
 const FILTERS = ['Family Friendly', 'Couples', 'Solo Travelers', 'Budget', 'Luxury', 'Indoor', 'Outdoor']

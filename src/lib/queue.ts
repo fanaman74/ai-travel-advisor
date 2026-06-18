@@ -9,6 +9,7 @@ let scrapeQueue: Queue<ScrapeLocationJobData> | null = null
 export function getScrapeQueue(): Queue<ScrapeLocationJobData> {
   if (!scrapeQueue) {
     scrapeQueue = new Queue<ScrapeLocationJobData>(SCRAPE_QUEUE, {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       connection: getRedis() as any,
       defaultJobOptions: {
         attempts: 3,

@@ -37,7 +37,7 @@ export function useLocation() {
     navigator.geolocation.getCurrentPosition(
       async pos => {
         const { latitude, longitude } = pos.coords
-        const geo = await reverseGeocode(latitude, longitude).catch(() => ({}))
+        const geo: Partial<UserLocation> = await reverseGeocode(latitude, longitude).catch(() => ({}))
 
         const location: UserLocation = {
           latitude, longitude,

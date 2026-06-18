@@ -258,7 +258,8 @@ Respond with ONLY a valid JSON object (no markdown):
     return {
       title: parsed.title ?? `Itinerary for ${input.city}`,
       stops: Array.isArray(parsed.stops)
-        ? parsed.stops.map((stop) => ({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ? parsed.stops.map((stop: any) => ({
             time: stop.time ?? '',
             place_id: null,
             name: stop.name ?? '',

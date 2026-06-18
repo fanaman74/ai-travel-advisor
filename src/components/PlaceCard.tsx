@@ -27,6 +27,7 @@ export function PlaceCard({ place, showDistance = true }: Props) {
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex flex-col gap-2">
       {place.photos?.[0] && (
+        // eslint-disable-next-line @next/next/no-img-element
         <img src={place.photos[0]} alt={place.name} className="w-full h-40 object-cover rounded-xl" />
       )}
       <div className="flex justify-between items-start">
