@@ -1,4 +1,6 @@
-import 'dotenv/config'
+import { config } from 'dotenv'
+config({ path: '.env.local' })
+config()
 import { Worker } from 'bullmq'
 import { getRedis } from './src/lib/redis'
 import { processScrapeLocation } from './src/worker/processor'

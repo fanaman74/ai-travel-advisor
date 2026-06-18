@@ -7,6 +7,7 @@ interface LocationState {
   jobId: string | null
   loading: boolean
   error: string | null
+  serverError: string | null
 }
 
 async function reverseGeocode(lat: number, lng: number): Promise<Partial<UserLocation>> {
@@ -25,7 +26,7 @@ async function reverseGeocode(lat: number, lng: number): Promise<Partial<UserLoc
 
 export function useLocation() {
   const [state, setState] = useState<LocationState>({
-    location: null, jobId: null, loading: true, error: null,
+    location: null, jobId: null, loading: true, error: null, serverError: null,
   })
 
   useEffect(() => {
@@ -52,9 +53,11 @@ export function useLocation() {
           body: JSON.stringify({ lat: latitude, lng: longitude }),
         }).catch(() => null)
 
-        const { jobId } = res ? await res.json() : {}
+        const data = res ? await res.json().catch(() => ({})) : {}
+        const jobId = res?.ok ? data.jobId : null
+        const apiError = res && !res.ok ? data.error ?? `API /api/location returned ${res.status}` : null
 
-        setState({ location, jobId: jobId ?? null, loading: false, error: null })
+        setState({ location, jobId: jobId ?? null, loading: false, error: null, serverError: apiError })
 
         try { localStorage.setItem('lastLocation', JSON.stringify({ ...location, scrapedAt: new Date().toISOString() })) } catch {}
       },

@@ -13,7 +13,7 @@ export interface Place {
   address: string | null
   opening_hours: Record<string, string> | null
   photos: string[] | null
-  source: 'google_maps' | 'tripadvisor' | 'eventbrite'
+  source: 'google_maps' | 'tripadvisor' | 'eventbrite' | 'osm'
   external_id: string | null
   summary: string | null
   pros: string[] | null
@@ -98,6 +98,10 @@ export interface RawApifyPlace {
   name?: string
   latitude?: number
   longitude?: number
+  location?: {
+    lat?: number
+    lng?: number
+  }
   totalScore?: number
   rating?: number
   reviewsCount?: number

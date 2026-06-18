@@ -6,5 +6,5 @@ function filterFn(place: Place, active: string[]): boolean {
   return active.some(f => place.best_for?.some(b => b.toLowerCase().includes(f.toLowerCase())))
 }
 export default function ThingsToDoPage() {
-  return <ExplorePage title="Things To Do" icon="🎯" filterOptions={FILTERS} filterFn={filterFn} />
+  return <ExplorePage title="Things To Do" icon="Discover" filterOptions={FILTERS} filterFn={filterFn} />
 }

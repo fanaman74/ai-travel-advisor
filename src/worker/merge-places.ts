@@ -3,6 +3,7 @@ import { arePlacesClose } from '@/lib/geo'
 
 export interface NormalisedPlace {
   name: string
+  type: 'restaurant' | 'attraction' | 'event' | 'hotel' | 'essential'
   latitude: number
   longitude: number
   rating: number | null
@@ -16,9 +17,30 @@ export interface NormalisedPlace {
   category: string | null
 }
 
+export function classifyPlaceType(category: string | null): NormalisedPlace['type'] {
+  const value = category?.toLowerCase() ?? ''
+
+  if (/\b(hotel|bed & breakfast|hostel|lodging|apartment|guest house)\b/.test(value)) {
+    return 'hotel'
+  }
+
+  if (/\b(restaurant|cafe|coffee|pub|bar|brasserie|bistro|pizza|salad|fast food|bakery|diner|food)\b/.test(value)) {
+    return 'restaurant'
+  }
+
+  if (/\b(parking|pharmacy|supermarket|grocery|store|hospital|bank|atm|gas station)\b/.test(value)) {
+    return 'essential'
+  }
+
+  return 'attraction'
+}
+
 function normalisePlace(raw: RawApifyPlace): NormalisedPlace | null {
+  const latitude = raw.latitude ?? raw.location?.lat
+  const longitude = raw.longitude ?? raw.location?.lng
+
   // Filter out places without lat/lng
-  if (raw.latitude == null || raw.longitude == null) {
+  if (latitude == null || longitude == null) {
     return null
   }
 
@@ -29,8 +51,9 @@ function normalisePlace(raw: RawApifyPlace): NormalisedPlace | null {
 
   return {
     name: raw.name ?? raw.title ?? 'Unknown',
-    latitude: raw.latitude,
-    longitude: raw.longitude,
+    type: classifyPlaceType(raw.categoryName ?? null),
+    latitude,
+    longitude,
     rating: raw.totalScore ?? raw.rating ?? null,
     review_count: raw.reviewsCount ?? null,
     address: raw.address ?? null,

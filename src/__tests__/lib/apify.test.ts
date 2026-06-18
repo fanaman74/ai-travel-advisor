@@ -5,15 +5,18 @@ jest.mock('apify-client')
 
 const mockDatasetListItems = jest.fn()
 const mockActorCall = jest.fn()
+const mockActor = jest.fn(() => ({ call: mockActorCall }))
 
 ;(ApifyClient as jest.Mock).mockImplementation(() => ({
-  actor: () => ({ call: mockActorCall }),
+  actor: mockActor,
   dataset: () => ({ listItems: mockDatasetListItems }),
 }))
 
 describe('runGoogleMapsScraper', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    process.env.APIFY_API_KEY = 'test-api-key'
+    delete process.env.APIFY_GOOGLE_MAPS_MAX_PLACES_PER_SEARCH
   })
 
   it('returns array of raw places', async () => {
@@ -36,11 +39,18 @@ describe('runGoogleMapsScraper', () => {
 
     await runGoogleMapsScraper({ lat: 51.2093, lng: 3.2247, radius: 1000 })
 
+    expect(mockActor).toHaveBeenCalledWith('compass/crawler-google-places')
     expect(mockActorCall).toHaveBeenCalled()
     const callArgs = mockActorCall.mock.calls[0][0]
     expect(callArgs.searchStringsArray).toBeDefined()
     expect(Array.isArray(callArgs.searchStringsArray)).toBe(true)
-    expect(callArgs.maxCrawledPlacesPerSearch).toBe(20)
+    expect(callArgs.searchStringsArray[0]).toBe('restaurants')
+    expect(callArgs.customGeolocation).toEqual({
+      type: 'Point',
+      coordinates: [3.2247, 51.2093],
+    })
+    expect(callArgs.maxCrawledPlacesPerSearch).toBe(5)
+    expect(callArgs.maxCrawledPlaces).toBe(30)
     expect(callArgs.language).toBe('en')
   })
 })
@@ -48,6 +58,8 @@ describe('runGoogleMapsScraper', () => {
 describe('runGoogleMapsReviewsScraper', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    process.env.APIFY_API_KEY = 'test-api-key'
+    delete process.env.APIFY_GOOGLE_MAPS_MAX_REVIEWS_PER_PLACE
   })
 
   it('returns array of reviews with place IDs', async () => {
@@ -77,21 +89,24 @@ describe('runGoogleMapsReviewsScraper', () => {
     expect(mockActorCall).not.toHaveBeenCalled()
   })
 
-  it('calls actor with maxReviewsPerPlace set to 10', async () => {
+  it('calls actor with maxReviewsPerPlace set to 3', async () => {
     mockActorCall.mockResolvedValue({ defaultDatasetId: 'ds123' })
     mockDatasetListItems.mockResolvedValue({ items: [] })
 
     await runGoogleMapsReviewsScraper(['place1'])
 
+    expect(mockActor).toHaveBeenCalledWith('compass/Google-Maps-Reviews-Scraper')
     expect(mockActorCall).toHaveBeenCalled()
     const callArgs = mockActorCall.mock.calls[0][0]
-    expect(callArgs.maxReviewsPerPlace).toBe(10)
+    expect(callArgs.maxReviewsPerPlace).toBe(3)
   })
 })
 
 describe('runTripAdvisorScraper', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    process.env.APIFY_API_KEY = 'test-api-key'
+    process.env.APIFY_TRIPADVISOR_LOCATION = 'Vilvoorde, Belgium'
   })
 
   it('returns array of raw places from TripAdvisor', async () => {
@@ -106,12 +121,17 @@ describe('runTripAdvisorScraper', () => {
 
     expect(results).toHaveLength(1)
     expect(results[0].title).toBe('Museum XYZ')
+    expect(mockActor).toHaveBeenCalledWith('maxcopell/tripadvisor')
+    expect(mockActorCall.mock.calls[0][0].query).toBe('Vilvoorde, Belgium')
   })
 })
 
 describe('runEventbriteScraper', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    process.env.APIFY_API_KEY = 'test-api-key'
+    process.env.APIFY_EVENTBRITE_COUNTRY = 'belgium'
+    process.env.APIFY_EVENTBRITE_CITY = 'Vilvoorde'
   })
 
   it('returns array of raw places from Eventbrite', async () => {
@@ -126,6 +146,7 @@ describe('runEventbriteScraper', () => {
 
     expect(results).toHaveLength(1)
     expect(results[0].title).toBe('Concert Event')
+    expect(mockActor).toHaveBeenCalledWith('aitorsm/eventbrite')
   })
 
   it('calls actor with today\'s ISO date as startDate', async () => {
@@ -136,7 +157,10 @@ describe('runEventbriteScraper', () => {
 
     expect(mockActorCall).toHaveBeenCalled()
     const callArgs = mockActorCall.mock.calls[0][0]
+    expect(callArgs.country).toBe('belgium')
+    expect(callArgs.city).toBe('Vilvoorde')
     expect(callArgs.startDate).toBeDefined()
+    expect(callArgs.maxResults).toBe(20)
     const datePattern = /^\d{4}-\d{2}-\d{2}$/
     expect(callArgs.startDate).toMatch(datePattern)
   })

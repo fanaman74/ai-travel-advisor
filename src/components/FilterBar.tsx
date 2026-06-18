@@ -5,11 +5,11 @@ export function FilterBar({ options, active, onChange }: Props) {
     onChange(active.includes(opt) ? active.filter(x => x !== opt) : [...active, opt])
   }
   return (
-    <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+    <div className="hide-scrollbar flex gap-2 overflow-x-auto pb-1">
       {options.map(opt => (
         <button key={opt} onClick={() => toggle(opt)}
-          className={`whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-            active.includes(opt) ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+          className={`airbnb-chip whitespace-nowrap px-4 py-2 text-sm font-semibold ${
+            active.includes(opt) ? 'airbnb-chip-active shadow-[0_8px_20px_rgba(34,34,34,0.14)]' : 'hover:border-[var(--line-strong)] hover:text-[#222222]'
           }`}>
           {opt}
         </button>

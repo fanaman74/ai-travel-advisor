@@ -11,10 +11,16 @@ export function AreaBriefing({ lat, lng, city, district }: Props) {
     url.searchParams.set('district', district)
     fetch(url.toString()).then(r => r.json()).then(d => setBriefing(d.briefing)).catch(() => {})
   }, [lat, lng, city, district])
-  if (!briefing) return <div className="h-12 bg-gray-100 rounded-xl animate-pulse" />
+  if (!briefing) return <div className="airbnb-card h-28 animate-pulse bg-[var(--surface-muted)]" />
   return (
-    <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-4">
-      <p className="text-sm text-indigo-800 leading-relaxed">{briefing}</p>
+    <div className="airbnb-card overflow-hidden p-0 stagger-fade-in">
+      <div className="bg-[linear-gradient(135deg,#ff385c,#ff7a59)] px-5 py-4 text-white">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/75">Area briefing</p>
+        <p className="mt-1 text-lg font-semibold">{city}{district ? `, ${district}` : ''}</p>
+      </div>
+      <div className="px-5 py-4">
+        <p className="text-sm leading-7 text-[#484848]">{briefing}</p>
+      </div>
     </div>
   )
 }

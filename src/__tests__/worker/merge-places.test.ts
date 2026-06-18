@@ -1,4 +1,4 @@
-import { mergePlaces } from '@/worker/merge-places'
+import { classifyPlaceType, mergePlaces } from '@/worker/merge-places'
 import type { RawApifyPlace } from '@/types'
 
 const base: RawApifyPlace = {
@@ -44,5 +44,26 @@ describe('mergePlaces', () => {
   it('normalises missing name from title field', () => {
     const result = mergePlaces([{ ...base, title: 'Title Place', name: undefined }])
     expect(result[0].name).toBe('Title Place')
+  })
+
+  it('normalises coordinates from current Google Maps actor location field', () => {
+    const result = mergePlaces([{
+      title: 'Location Field Cafe',
+      location: { lat: 50.9024, lng: 4.3711 },
+      totalScore: 4.8,
+      placeId: 'gm_location',
+    }])
+
+    expect(result).toHaveLength(1)
+    expect(result[0].latitude).toBe(50.9024)
+    expect(result[0].longitude).toBe(4.3711)
+  })
+
+  it('classifies restaurants and hotels from Google categories', () => {
+    expect(classifyPlaceType('Italian restaurant')).toBe('restaurant')
+    expect(classifyPlaceType('Cafe')).toBe('restaurant')
+    expect(classifyPlaceType('Hotel')).toBe('hotel')
+    expect(classifyPlaceType('Parking garage')).toBe('essential')
+    expect(classifyPlaceType('Museum')).toBe('attraction')
   })
 })
