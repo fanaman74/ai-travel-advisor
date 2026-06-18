@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
 import { query } from '@/lib/db'
 import { generateAreaBriefing } from '@/lib/ai'
