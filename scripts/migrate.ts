@@ -1,5 +1,7 @@
 import { config } from 'dotenv'
 config({ path: '.env.local' })
+import dns from 'dns'
+dns.setDefaultResultOrder('ipv4first')
 import { Pool } from 'pg'
 import { readFileSync, readdirSync } from 'fs'
 import { join } from 'path'
