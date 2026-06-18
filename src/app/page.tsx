@@ -22,21 +22,66 @@ export default function DashboardPage() {
     jobDone ? 1 : 0
   )
 
-  if (locLoading) {
+  const steps = [
+    {
+      label: 'Detect location',
+      status: locLoading ? 'loading' : error ? 'error' : location ? 'done' : 'waiting',
+      detail: error ?? (location ? `${location.city} (${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)})` : ''),
+    },
+    {
+      label: 'Register with server',
+      status: locLoading ? 'waiting' : error ? 'error' : jobId ? 'done' : 'error',
+      detail: jobId ? `Job ${jobId.slice(0, 8)}…` : (!locLoading && !error && !jobId ? 'API /api/location returned error' : ''),
+    },
+    {
+      label: 'Scrape nearby places',
+      status: !jobId ? 'waiting' : jobStatus.status === 'completed' ? 'done' : jobStatus.status === 'failed' ? 'error' : jobStatus.status === 'running' ? 'loading' : 'loading',
+      detail: jobStatus.status ? `Status: ${jobStatus.status}${jobStatus.progress ? ` (${jobStatus.progress}%)` : ''}` : '',
+    },
+    {
+      label: 'Show results',
+      status: places.length > 0 ? 'done' : jobDone ? 'error' : 'waiting',
+      detail: places.length > 0 ? `${places.length} places found` : jobDone ? 'No places found — try larger radius' : '',
+    },
+  ]
+
+  const icon = (s: string) => s === 'done' ? '✅' : s === 'error' ? '❌' : s === 'loading' ? '⏳' : '⬜'
+
+  if (locLoading || (!location && !error)) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-6">
-        <div className="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center text-3xl animate-pulse">📍</div>
-        <p className="text-gray-500 text-sm">Detecting your location…</p>
+      <div className="flex flex-col min-h-screen gap-4 p-6 pt-12">
+        <h1 className="text-lg font-bold text-gray-900">Loading…</h1>
+        <div className="flex flex-col gap-3">
+          {steps.map((s, i) => (
+            <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-gray-50">
+              <span className="text-lg mt-0.5">{icon(s.status)}</span>
+              <div>
+                <p className={`text-sm font-medium ${s.status === 'error' ? 'text-red-600' : 'text-gray-800'}`}>{s.label}</p>
+                {s.detail && <p className="text-xs text-gray-500 mt-0.5">{s.detail}</p>}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen gap-3 p-6">
-        <p className="text-2xl">⚠️</p>
-        <p className="text-gray-700 text-center text-sm">{error}</p>
-        <p className="text-gray-400 text-xs text-center">Enable location access and reload the page.</p>
+      <div className="flex flex-col min-h-screen gap-4 p-6 pt-12">
+        <h1 className="text-lg font-bold text-gray-900">Setup Status</h1>
+        <div className="flex flex-col gap-3">
+          {steps.map((s, i) => (
+            <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-gray-50">
+              <span className="text-lg mt-0.5">{icon(s.status)}</span>
+              <div>
+                <p className={`text-sm font-medium ${s.status === 'error' ? 'text-red-600' : 'text-gray-800'}`}>{s.label}</p>
+                {s.detail && <p className="text-xs text-gray-500 mt-0.5">{s.detail}</p>}
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="text-xs text-gray-400 text-center mt-2">Enable location access and reload the page.</p>
       </div>
     )
   }
@@ -54,6 +99,22 @@ export default function DashboardPage() {
       {location && <AreaBriefing lat={location.latitude} lng={location.longitude} city={location.city} district={location.district} />}
 
       {jobId && !jobDone && <LoadingPulse progress={jobStatus.progress} message="Finding the best spots nearby…" />}
+
+      {/* Status panel — shows when no places yet */}
+      {places.length === 0 && (
+        <div className="rounded-2xl border border-gray-100 bg-gray-50 p-4 flex flex-col gap-2">
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Pipeline status</p>
+          {steps.map((s, i) => (
+            <div key={i} className="flex items-center gap-2">
+              <span className="text-base">{icon(s.status)}</span>
+              <div className="flex-1 min-w-0">
+                <span className={`text-xs font-medium ${s.status === 'error' ? 'text-red-600' : 'text-gray-700'}`}>{s.label}</span>
+                {s.detail && <span className="text-xs text-gray-400 ml-1">— {s.detail}</span>}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       <QuickActionGrid />
 
