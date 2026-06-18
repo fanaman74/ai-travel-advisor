@@ -7,6 +7,7 @@ export function getPool(): Pool {
     g._pgPool = new Pool({
       connectionString: process.env.DATABASE_URL,
       max: 10,
+      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
     })
   }
   return g._pgPool
