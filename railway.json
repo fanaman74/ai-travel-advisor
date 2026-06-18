@@ -5,7 +5,7 @@
     "buildCommand": "npm run build && npm run build:worker && npm run build:migrate"
   },
   "deploy": {
-    "startCommand": "npm run migrate:start && npm start",
+    "startCommand": "npm run migrate:start; npm start",
     "healthcheckPath": "/",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 3
