@@ -5,9 +5,11 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:worker": "esbuild worker.ts --bundle --platform=node --outfile=dist/worker.js --packages=external",
     "start": "next start",
     "lint": "next lint",
     "worker": "ts-node -r tsconfig-paths/register --project tsconfig.worker.json worker.ts",
+    "worker:start": "node dist/worker.js",
     "migrate": "ts-node --compiler-options '{\"module\":\"commonjs\",\"moduleResolution\":\"node\"}' scripts/migrate.ts",
     "test": "jest",
     "test:watch": "jest --watch"
@@ -36,6 +38,7 @@
     "@types/pg": "^8.20.0",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "esbuild": "^0.28.1",
     "eslint": "^8",
     "eslint-config-next": "14.2.35",
     "jest": "^29.7.0",
