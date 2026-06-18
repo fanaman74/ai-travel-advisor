@@ -2,12 +2,11 @@ export const dynamic = 'force-dynamic'
 import { NextRequest } from 'next/server'
 import OpenAI from 'openai'
 
-const client = new OpenAI({
-  apiKey: process.env.DEEPSEEK_API_KEY,
-  baseURL: 'https://api.deepseek.com/v1',
-})
-
 export async function POST(req: NextRequest) {
+  const client = new OpenAI({
+    apiKey: process.env.DEEPSEEK_API_KEY,
+    baseURL: 'https://api.deepseek.com/v1',
+  })
   const { message, locationContext, history } = await req.json()
 
   const systemPrompt = `You are a knowledgeable travel assistant. The user is currently in ${locationContext?.city ?? 'an unknown location'}, ${locationContext?.country ?? ''}.
