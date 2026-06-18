@@ -1,13 +1,19 @@
 <svg width="640" height="520" viewBox="0 0 640 520" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="640" height="520" rx="44" fill="#F9F4FF"/>
-  <circle cx="500" cy="120" r="58" fill="#E1D2FF"/>
-  <path d="M170 238H470L512 420H128L170 238Z" fill="#D8C6FF"/>
-  <path d="M144 238L320 132L496 238H144Z" fill="#BFA0FF"/>
-  <rect x="152" y="248" width="44" height="150" rx="22" fill="#FFF8FF"/>
-  <rect x="224" y="248" width="44" height="150" rx="22" fill="#FFF8FF"/>
-  <rect x="296" y="248" width="44" height="150" rx="22" fill="#FFF8FF"/>
-  <rect x="368" y="248" width="44" height="150" rx="22" fill="#FFF8FF"/>
-  <rect x="440" y="248" width="44" height="150" rx="22" fill="#FFF8FF"/>
-  <rect x="128" y="404" width="384" height="24" rx="12" fill="#B79AFF"/>
-  <rect x="182" y="170" width="276" height="24" rx="12" fill="#EFE5FF"/>
+  <rect width="640" height="520" rx="44" fill="#FCF2EA"/>
+  <path d="M0 0H640V212C584 198 524 190 428 190C302 190 184 208 0 232V0Z" fill="#F5B9AF"/>
+  <path d="M0 98C64 76 112 76 154 120C192 160 226 168 270 146C304 128 338 128 372 152C408 178 438 180 484 152C534 122 588 126 640 154V262H0V98Z" fill="#23BBB0"/>
+  <path d="M0 160C72 134 138 138 190 176C228 204 258 212 310 198C362 184 412 188 460 220C504 248 570 256 640 236V314H0V160Z" fill="#0E7D8D"/>
+  <circle cx="232" cy="172" r="34" fill="#FF8256"/>
+  <path d="M0 252C130 220 238 214 346 236C450 258 542 256 640 224V520H0V252Z" fill="#269747"/>
+  <path d="M0 316C136 286 254 288 360 314C462 338 554 336 640 300V520H0V316Z" fill="#95D06F"/>
+  <path d="M190 346L322 250L450 346H190Z" fill="#E8D7C8"/>
+  <path d="M214 346H426L450 406H190L214 346Z" fill="#D7C1AB"/>
+  <rect x="220" y="352" width="28" height="52" rx="14" fill="#FFF5EA"/>
+  <rect x="268" y="352" width="28" height="52" rx="14" fill="#FFF5EA"/>
+  <rect x="316" y="352" width="28" height="52" rx="14" fill="#FFF5EA"/>
+  <rect x="364" y="352" width="28" height="52" rx="14" fill="#FFF5EA"/>
+  <path d="M298 234L322 206L346 234H298Z" fill="#F7E6D5"/>
+  <rect x="308" y="234" width="28" height="54" rx="14" fill="#ECD7C2"/>
+  <path d="M84 520C100 454 122 404 152 370C180 336 208 310 220 278L180 294C156 332 132 362 116 398C98 434 88 476 82 520H84Z" fill="#138F95"/>
+  <path d="M120 520C140 448 170 396 204 356C230 324 256 294 270 260L230 270C206 308 178 338 152 370C124 404 104 454 94 520H120Z" fill="#17A2A8"/>
 </svg>

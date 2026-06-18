@@ -20,7 +20,7 @@ export function QuickActionGrid() {
           href={action.href}
           className="airbnb-card overflow-hidden p-0 transition-transform duration-200 hover:-translate-y-0.5"
         >
-          <div className="aspect-[1.18/1] overflow-hidden" style={{ backgroundColor: action.tint }}>
+          <div className="aspect-[1.28/1] overflow-hidden" style={{ backgroundColor: action.tint }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={action.image}
