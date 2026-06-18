@@ -6,11 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "build:worker": "esbuild worker.ts --bundle --platform=node --outfile=dist/worker.js --packages=external",
+    "build:migrate": "esbuild scripts/migrate.ts --bundle --platform=node --outfile=dist/migrate.js --packages=external",
     "start": "next start",
     "lint": "next lint",
     "worker": "ts-node -r tsconfig-paths/register --project tsconfig.worker.json worker.ts",
     "worker:start": "node dist/worker.js",
     "migrate": "ts-node --compiler-options '{\"module\":\"commonjs\",\"moduleResolution\":\"node\"}' scripts/migrate.ts",
+    "migrate:start": "node dist/migrate.js",
     "test": "jest",
     "test:watch": "jest --watch"
   },
