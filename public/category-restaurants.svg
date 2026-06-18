@@ -1,0 +1,15 @@
+<svg width="640" height="520" viewBox="0 0 640 520" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="640" height="520" rx="44" fill="#FFF7EE"/>
+  <circle cx="500" cy="122" r="58" fill="#FFD9B9"/>
+  <ellipse cx="320" cy="315" rx="170" ry="98" fill="#FFE7D1"/>
+  <ellipse cx="320" cy="303" rx="152" ry="80" fill="#FFF9F2"/>
+  <path d="M244 265C263 247 286 238 320 238C354 238 377 247 396 265" stroke="#FFBC7A" stroke-width="22" stroke-linecap="round"/>
+  <circle cx="256" cy="286" r="15" fill="#FF8FA3"/>
+  <circle cx="319" cy="275" r="15" fill="#90D0A3"/>
+  <circle cx="385" cy="291" r="15" fill="#F5C65B"/>
+  <path d="M190 148C190 127.013 207.013 110 228 110V110C248.987 110 266 127.013 266 148V220H190V148Z" fill="#FFE0C1"/>
+  <rect x="206" y="98" width="16" height="116" rx="8" fill="#FFC78D"/>
+  <rect x="234" y="98" width="16" height="116" rx="8" fill="#FFC78D"/>
+  <rect x="386" y="96" width="18" height="124" rx="9" fill="#FFCF95"/>
+  <path d="M416 96H446C460.359 96 472 107.641 472 122V126C472 140.359 460.359 152 446 152H430V220H416V96Z" fill="#FFE0C1"/>
+</svg>

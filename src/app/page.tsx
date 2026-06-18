@@ -10,10 +10,11 @@ import { LoadingPulse } from '@/components/LoadingPulse'
 import { RadiusSelector } from '@/components/RadiusSelector'
 
 export default function DashboardPage() {
-  const { location, jobId, loading: locLoading, error, serverError } = useLocation()
+  const { location, jobId, mode, loading: locLoading, error, serverError } = useLocation()
   const jobStatus = useJobStatus(jobId)
   const [radius, setRadius] = useState(5000)
-  const jobDone = jobStatus.status === 'completed' || jobStatus.status === 'failed'
+  const localMode = mode === 'local'
+  const jobDone = localMode || jobStatus.status === 'completed' || jobStatus.status === 'failed'
   const { places, loading: placesLoading } = useNearby(
     location?.latitude ?? null,
     location?.longitude ?? null,
@@ -30,13 +31,31 @@ export default function DashboardPage() {
     },
     {
       label: 'Register with server',
-      status: locLoading ? 'waiting' : serverError ? 'error' : jobId ? 'done' : 'error',
-      detail: jobId ? `Job ${jobId.slice(0, 8)}…` : (!locLoading && !error && !jobId ? serverError ?? 'API /api/location returned error' : ''),
+      status: locLoading ? 'waiting' : serverError ? 'error' : (jobId || localMode) ? 'done' : 'error',
+      detail: localMode
+        ? 'Local mode active'
+        : jobId
+          ? `Job ${jobId.slice(0, 8)}...`
+          : (!locLoading && !error && !jobId ? serverError ?? 'API /api/location returned error' : ''),
     },
     {
       label: 'Scrape nearby places',
-      status: !jobId ? 'waiting' : jobStatus.status === 'completed' ? 'done' : jobStatus.status === 'failed' ? 'error' : jobStatus.status === 'running' ? 'loading' : 'loading',
-      detail: jobStatus.status ? `Status: ${jobStatus.status}${jobStatus.progress ? ` (${jobStatus.progress}%)` : ''}` : '',
+      status: localMode
+        ? 'done'
+        : !jobId
+          ? 'waiting'
+          : jobStatus.status === 'completed'
+            ? 'done'
+            : jobStatus.status === 'failed'
+              ? 'error'
+              : jobStatus.status === 'running'
+                ? 'loading'
+                : 'loading',
+      detail: localMode
+        ? 'Using live nearby lookup'
+        : jobStatus.status
+          ? `Status: ${jobStatus.status}${jobStatus.progress ? ` (${jobStatus.progress}%)` : ''}`
+          : '',
     },
     {
       label: 'Show results',
@@ -113,7 +132,7 @@ export default function DashboardPage() {
 
       {location && <AreaBriefing lat={location.latitude} lng={location.longitude} city={location.city} district={location.district} />}
 
-      {jobId && !jobDone && <LoadingPulse progress={jobStatus.progress} message="Finding the best spots nearby…" />}
+      {jobId && !jobDone && <LoadingPulse progress={jobStatus.progress} message="Finding the best spots nearby..." />}
 
       {places.length === 0 && (
         <div className="airbnb-card flex flex-col gap-3 p-4">
@@ -164,7 +183,7 @@ export default function DashboardPage() {
           </div>
         ) : places.length === 0 ? (
           <div className="airbnb-card px-6 py-10 text-center text-sm text-[var(--text-muted)]">
-            {jobDone ? 'No places found nearby. Try a larger radius.' : 'Places loading in background…'}
+            {jobDone ? 'No places found nearby. Try a larger radius.' : 'Places loading in background...'}
           </div>
         ) : (
           <div className="flex flex-col gap-4">

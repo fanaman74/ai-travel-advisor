@@ -20,7 +20,7 @@
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: inherit;
+  font-family: "Avenir Next", Avenir, "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 

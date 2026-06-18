@@ -31,6 +31,20 @@ function mergePlacesWithFallback(primary: Place[], fallback: Place[]): Place[] {
     .slice(0, 100)
 }
 
+function isLocalServiceError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error)
+
+  return [
+    'ENETUNREACH',
+    'ECONNREFUSED',
+    'ECONNRESET',
+    'EHOSTUNREACH',
+    'getaddrinfo',
+    'Connection is closed',
+    'connect',
+  ].some(fragment => message.includes(fragment))
+}
+
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl
   const lat = parseFloat(searchParams.get('lat') ?? '')
@@ -42,11 +56,17 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'lat and lng are required' }, { status: 400 })
   }
 
-  const redis = getRedis()
   const cacheKey = `places:${toGeohash(lat, lng)}:${radius}:${type ?? 'all'}`
-  const cached = await redis.get(cacheKey)
-  if (cached) {
-    return NextResponse.json({ places: JSON.parse(cached), cached: true })
+  let redis: ReturnType<typeof getRedis> | null = null
+
+  try {
+    redis = getRedis()
+    const cached = await redis.get(cacheKey)
+    if (cached) {
+      return NextResponse.json({ places: JSON.parse(cached), cached: true })
+    }
+  } catch (error) {
+    console.warn('Nearby cache unavailable:', error)
   }
 
   const params: unknown[] = [lng, lat, radius]
@@ -56,36 +76,58 @@ export async function GET(req: NextRequest) {
     typeFilter = `AND type = $${params.length}`
   }
 
-  const places = await query<Place>(
-    `SELECT
-       id, name, type, category, latitude, longitude,
-       rating::float8 AS rating,
-       review_count,
-       price_level,
-       phone, website, address, opening_hours, photos, source, external_id,
-       summary, pros, cons, best_for, visit_duration,
-       hidden_gem_score,
-       tourist_trap_score,
-       ai_processed_at, scraped_at, created_at, updated_at,
-       ST_Distance(location::geography, ST_MakePoint($1, $2)::geography)::float8 AS distance_m
-     FROM places
-     WHERE ST_DWithin(location::geography, ST_MakePoint($1, $2)::geography, $3)
-       ${typeFilter}
-     ORDER BY distance_m ASC
-     LIMIT 100`,
-    params
-  )
+  let places: Place[] = []
+  let databaseAvailable = true
+
+  try {
+    places = await query<Place>(
+      `SELECT
+         id, name, type, category, latitude, longitude,
+         rating::float8 AS rating,
+         review_count,
+         price_level,
+         phone, website, address, opening_hours, photos, source, external_id,
+         summary, pros, cons, best_for, visit_duration,
+         hidden_gem_score,
+         tourist_trap_score,
+         ai_processed_at, scraped_at, created_at, updated_at,
+         ST_Distance(location::geography, ST_MakePoint($1, $2)::geography)::float8 AS distance_m
+       FROM places
+       WHERE ST_DWithin(location::geography, ST_MakePoint($1, $2)::geography, $3)
+         ${typeFilter}
+       ORDER BY distance_m ASC
+       LIMIT 100`,
+      params
+    )
+  } catch (error) {
+    if (!isLocalServiceError(error)) {
+      throw error
+    }
+
+    databaseAvailable = false
+    console.warn('Nearby database unavailable, using live fallback:', error)
+  }
 
   let result = places
-  if (type === 'restaurant' && places.length < 25) {
+  const canUseOsmFallback = !type || type === 'restaurant'
+  const shouldUseOsmFallback = canUseOsmFallback && (!databaseAvailable || (type === 'restaurant' && places.length < 25) || (!type && places.length < 12))
+
+  if (shouldUseOsmFallback) {
     const osmRestaurants = await fetchOsmRestaurants({ lat, lng, radius }).catch(error => {
       console.warn(`OpenStreetMap restaurant fallback failed: ${error instanceof Error ? error.message : String(error)}`)
       return []
     })
-    result = mergePlacesWithFallback(places, osmRestaurants)
+
+    result = databaseAvailable ? mergePlacesWithFallback(places, osmRestaurants) : osmRestaurants
   }
 
-  await redis.setex(cacheKey, 3_600, JSON.stringify(result))
+  if (redis) {
+    try {
+      await redis.setex(cacheKey, 3_600, JSON.stringify(result))
+    } catch (error) {
+      console.warn('Nearby cache write failed:', error)
+    }
+  }
 
   return NextResponse.json({ places: result, cached: false })
 }

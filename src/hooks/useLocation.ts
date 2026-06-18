@@ -5,6 +5,7 @@ import type { UserLocation } from '@/types'
 interface LocationState {
   location: UserLocation | null
   jobId: string | null
+  mode: 'queued' | 'local' | null
   loading: boolean
   error: string | null
   serverError: string | null
@@ -26,7 +27,7 @@ async function reverseGeocode(lat: number, lng: number): Promise<Partial<UserLoc
 
 export function useLocation() {
   const [state, setState] = useState<LocationState>({
-    location: null, jobId: null, loading: true, error: null, serverError: null,
+    location: null, jobId: null, mode: null, loading: true, error: null, serverError: null,
   })
 
   useEffect(() => {
@@ -55,9 +56,17 @@ export function useLocation() {
 
         const data = res ? await res.json().catch(() => ({})) : {}
         const jobId = res?.ok ? data.jobId : null
+        const mode = res?.ok ? (data.mode === 'local' ? 'local' : data.mode === 'queued' ? 'queued' : null) : null
         const apiError = res && !res.ok ? data.error ?? `API /api/location returned ${res.status}` : null
 
-        setState({ location, jobId: jobId ?? null, loading: false, error: null, serverError: apiError })
+        setState({
+          location,
+          jobId: jobId ?? null,
+          mode,
+          loading: false,
+          error: null,
+          serverError: apiError,
+        })
 
         try { localStorage.setItem('lastLocation', JSON.stringify({ ...location, scrapedAt: new Date().toISOString() })) } catch {}
       },
